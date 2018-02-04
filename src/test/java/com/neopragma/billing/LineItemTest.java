@@ -19,6 +19,7 @@ public class LineItemTest {
 	private final int TEST_NEGATIVE_QUANTITY = (int) (-17d * Math.random()) - 1;
 	private final String TEST_SKU = UUID.randomUUID().toString();
 	private final LineItem INSTANCE = new LineItem(TEST_SKU, TEST_POSITIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
+	private final double TEST_TOTAL_COST = TEST_POSTITIVE_AMOUNT * TEST_POSITIVE_QUANTITY;
 
 	/**
 	 * Test of getAmount method, of class LineItem.
@@ -154,6 +155,15 @@ public class LineItemTest {
 	// object without capturing its referece.
 	private LineItem newLineItem(String SKU, int quantity, double unitPrice) {
 		return new LineItem(SKU, quantity, unitPrice);
+	}
+
+
+	/**
+	 * Test of getCost method, of class LineItem.
+	 */
+	@Test
+	public void testGetCost() {
+		assertThat("Amount should be zero (free).", INSTANCE.getCost(), closeTo(TEST_TOTAL_COST, 0.001));
 	}
 
 }

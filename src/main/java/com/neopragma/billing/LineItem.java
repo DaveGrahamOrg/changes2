@@ -109,4 +109,15 @@ public class LineItem {
 			.toString();
 	}
 
+	/**
+	 * Get the total cost for the items.
+	 *
+	 * This is the quantity multiplied by the unit price.
+	 *
+	 * @return the total cost for the items
+	 * @since 1.1
+	 */
+	public double getCost() {
+		return getItemQuantity() * getAmount();
+	}
 }

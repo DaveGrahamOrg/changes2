@@ -3,6 +3,8 @@ package com.neopragma.billing;
 import java.util.UUID;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.number.IsCloseTo.closeTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
@@ -30,6 +32,7 @@ public class LineItemTest {
    * Test of getQuantity method, of class LineItem.
    */
   @Test
+  @SuppressWarnings("deprecation")
   public void testGetQuantity() {
     assertThat("Wrong amount.", INSTANCE.getQuantity(), closeTo(TEST_POSITIVE_QUANTITY, 0.001));
   }
@@ -65,6 +68,86 @@ public class LineItemTest {
   public void testConstructorNegativeAmount() {
     final LineItem instance = new LineItem(TEST_SKU, TEST_POSITIVE_QUANTITY, TEST_NEGATIVE_AMOUNT);
     assertThat("Amount should be negative.", instance.getAmount(), closeTo(TEST_NEGATIVE_AMOUNT, 0.001));
+  }
+
+  /**
+   * Test of getItemQuantity method, of class LineItem.
+   */
+  @Test
+  public void testGetItemQuantity() {
+    assertThat("Wrong amount.", INSTANCE.getItemQuantity(), is(TEST_POSITIVE_QUANTITY));
+  }
+
+  /**
+   * Test of equals method, of class LineItem.
+   */
+  @Test
+  public void testEquals() {
+    final LineItem instance = new LineItem(TEST_SKU, TEST_POSITIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
+    assertEquals("The LineItems should be equal.", INSTANCE, instance);
+  }
+
+  /**
+   * Test of equals method, of class LineItem.
+   */
+  @Test
+  public void testEqualsFalseQuantity() {
+    final LineItem instance = new LineItem(TEST_SKU, 10000, TEST_POSTITIVE_AMOUNT);
+    assertNotEquals("The LineItems should not be equal.", INSTANCE, instance);
+  }
+
+  /**
+   * Test of equals method, of class LineItem.
+   */
+  @Test
+  public void testEqualsFalseAmount() {
+    final LineItem instance = new LineItem(TEST_SKU, TEST_POSITIVE_QUANTITY, 0);
+    assertNotEquals("The LineItems should not be equal.", INSTANCE, instance);
+  }
+
+  /**
+   * Test of equals method, of class LineItem.
+   */
+  @Test
+  public void testEqualsFalseSku() {
+    final LineItem instance = new LineItem("Other", TEST_POSITIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
+    assertNotEquals("The LineItems should not be equal.", INSTANCE, instance);
+  }
+
+  /**
+   * Test of hashCode method, of class LineItem.
+   */
+  @Test
+  public void testHashCode() {
+    final LineItem instance = new LineItem(TEST_SKU, TEST_POSITIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
+    assertThat("The hashcodes should match.", INSTANCE.hashCode(), is(instance.hashCode()));
+  }
+
+  /**
+   * Test of hashCode method, of class LineItem.
+   */
+  @Test
+  public void testHashCodeNotEqualsQuanity() {
+    final LineItem instance = new LineItem(TEST_SKU, 10000, TEST_POSTITIVE_AMOUNT);
+    assertNotEquals("The hashcodes should not match.", INSTANCE.hashCode(), instance.hashCode());
+  }
+
+  /**
+   * Test of hashCode method, of class LineItem.
+   */
+  @Test
+  public void testHashCodeNotEqualsAmount() {
+    final LineItem instance = new LineItem(TEST_SKU, TEST_POSITIVE_QUANTITY, 0);
+    assertNotEquals("The hashcodes should not match.", INSTANCE.hashCode(), instance.hashCode());
+  }
+
+  /**
+   * Test of hashCode method, of class LineItem.
+   */
+  @Test
+  public void testHashCodeNotEqualsSku() {
+    final LineItem instance = new LineItem("Other", TEST_POSITIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
+    assertNotEquals("The hashcodes should not match.", INSTANCE.hashCode(), instance.hashCode());
   }
 
   // Keeps IDE or other quality checker from compaining about constructing a new

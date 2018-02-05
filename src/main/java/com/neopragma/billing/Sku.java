@@ -1,11 +1,7 @@
 package com.neopragma.billing;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ForwardingList;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,12 +18,9 @@ import java.util.stream.Stream;
  *
  * @since 1.1
  */
-public class Sku extends ForwardingList<String> {
+public class Sku {
 
 	private static final Pattern SKU_PATTERN = Pattern.compile("([A-Z]{3})-([0-9]{2})-([A-Z]{2})-([0-9]{5})");
-	private static final int PART2_INDEX = 1;
-	private static final int PART4_INDEX = 3;
-	private final List<String> components;
 	private final String cachedToString;
 
 	/**
@@ -42,11 +35,6 @@ public class Sku extends ForwardingList<String> {
 		Preconditions.checkNotNull(skuString, "skuString == null");
 		final Matcher matcher = SKU_PATTERN.matcher(skuString);
 		Preconditions.checkArgument(matcher.find(), "Malformed SKU: " + skuString);
-		final List<String> groups = new ArrayList<>(4);
-		for (int i = 1; i <= 4; i++) {
-			groups.add(matcher.group(i));
-		}
-		components = Collections.unmodifiableList(groups);
 		cachedToString = skuString;
 	}
 
@@ -97,32 +85,9 @@ public class Sku extends ForwardingList<String> {
 		this(String.format("%s-%02d-%s-%05d", part1, part2, part3, part4));
 	}
 
-	/**
-	 * Get the second component of the SKU code as an integer.
-	 *
-	 * @return the second component of the SKU code as an integer
-	 */
-	public int getPart2AsInt() {
-		return Integer.parseInt(get(PART2_INDEX));
-	}
-
-	/**
-	 * Get the forth component of the SKU code as an integer.
-	 *
-	 * @return the forth component of the SKU code as an integer
-	 */
-	public int getPart4AsInt() {
-		return Integer.parseInt(get(PART4_INDEX));
-	}
-
 	@Override
 	public String toString() {
 		return cachedToString;
-	}
-
-	@Override
-	protected List<String> delegate() {
-		return components;
 	}
 
 	@Override

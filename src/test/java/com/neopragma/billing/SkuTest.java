@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -30,24 +29,6 @@ public class SkuTest {
 	private static final String TEST_ALT_PART_2 = "45";
 	private static final String TEST_ALT_PART_3 = "WV";
 	private static final String TEST_ALT_PART_4 = "83428";
-
-	/**
-	 * Test of getPart2AsInt method, of class Sku.
-	 */
-	@Test
-	public void testGetPart2AsInt() {
-		final Sku instance = new Sku(TEST_SKU_STRING);
-		assertThat("Wrong integer value.", instance.getPart2AsInt(), is(TEST_PART_2_INT));
-	}
-
-	/**
-	 * Test of getPart4AsInt method, of class Sku.
-	 */
-	@Test
-	public void testGetPart4AsInt() {
-		final Sku instance = new Sku(TEST_SKU_STRING);
-		assertThat("Wrong integer value.", instance.getPart4AsInt(), is(TEST_PART_4_INT));
-	}
 
 	/**
 	 * Test of toString method, of class Sku.
@@ -183,30 +164,6 @@ public class SkuTest {
 	public void testToStringCollectionConstructor_1234() {
 		final Sku instance = new Sku(Arrays.asList(TEST_SKU_STRING));
 		assertThat("Wrong integer value.", instance.toString(), is(TEST_SKU_STRING));
-	}
-
-	@Test
-	public void testListContent() {
-		final Sku instance = new Sku(TEST_SKU_STRING);
-		assertThat("Unexpected content.", instance, contains(TEST_PART_1, TEST_PART_2, TEST_PART_3, TEST_PART_4));
-	}
-
-	@Test
-	public void testListContentArray() {
-		final Sku instance = new Sku(Arrays.asList(TEST_SKU_STRING));
-		assertThat("Unexpected content.", instance, contains(TEST_PART_1, TEST_PART_2, TEST_PART_3, TEST_PART_4));
-	}
-
-	@Test
-	public void testListContentParameters() {
-		final Sku instance = new Sku(TEST_PART_1, TEST_PART_2_INT, TEST_PART_3, TEST_PART_4_INT);
-		assertThat("Unexpected content.", instance, contains(TEST_PART_1, TEST_PART_2, TEST_PART_3, TEST_PART_4));
-	}
-
-	@Test
-	public void testListContentCollection() {
-		final Sku instance = new Sku(TEST_COLLECTION_ALL_COMPONENTS);
-		assertThat("Unexpected content.", instance, contains(TEST_PART_1, TEST_PART_2, TEST_PART_3, TEST_PART_4));
 	}
 
 	/**

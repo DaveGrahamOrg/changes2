@@ -1,7 +1,6 @@
 package com.neopragma.billing;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Currency;
 import java.util.Locale;
 import static org.junit.Assert.*;

@@ -15,6 +15,8 @@ import java.util.Locale;
  */
 public class Invoice {
 
+	public static final String FEATURE_FLAG_INVOICE_TOTAL_CALCULATED_ON_ADD = "isInvoiceTotalCalculatedOnAdd";
+
 	// TODO: Check with product owner about typical size of most invoices.
 	public static final int TYPICAL_SIZE = 10;
 
@@ -42,7 +44,9 @@ public class Invoice {
 	public void add(final LineItem lineItem) {
 		Preconditions.checkNotNull(lineItem, "lineItem == null");
 		lineItems.add(lineItem);
-		total = total.add(lineItem.getCost());
+		if (isInvoiceTotalCalculatedOnAdd()) {
+			total = total.add(lineItem.getCost());
+		}
 	}
 
 	/**
@@ -62,7 +66,11 @@ public class Invoice {
 	 * @since 1.1
 	 */
 	public BigDecimal getInvoiceTotal() {
-		return total;
+		if (isInvoiceTotalCalculatedOnAdd()) {
+			return total;
+		} else {
+			return lineItems.stream().map(lineItem -> lineItem.getCost()).reduce(BigDecimal.ZERO, BigDecimal::add);
+		}
 	}
 
 	/**
@@ -82,4 +90,9 @@ public class Invoice {
 				.toString();
 	}
 
+	private boolean isInvoiceTotalCalculatedOnAdd() {
+		final String property = System.getProperty(FEATURE_FLAG_INVOICE_TOTAL_CALCULATED_ON_ADD);
+		// Only calculate on add when property is set to "true".
+		return property == null ? false : property.equalsIgnoreCase(Boolean.TRUE.toString());
+	}
 }

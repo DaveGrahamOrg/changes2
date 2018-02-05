@@ -1,6 +1,9 @@
 package com.neopragma.billing;
 
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Currency;
+import java.util.Locale;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertEquals;
@@ -13,19 +16,31 @@ import org.junit.Test;
  */
 public class LineItemTest {
 
-	private final double TEST_POSTITIVE_AMOUNT = 40d * Math.random() + 1d;
-	private final double TEST_NEGATIVE_AMOUNT = -22d * Math.random() - 1d;
+	private final Currency CURRENCY = Currency.getInstance(Locale.getDefault(Locale.Category.FORMAT));
+	private final BigDecimal TEST_POSTITIVE_AMOUNT = new BigDecimal(40d * Math.random() + 1d).setScale(CURRENCY.getDefaultFractionDigits(), RoundingMode.HALF_EVEN);
+	private final BigDecimal TEST_NEGATIVE_AMOUNT = new BigDecimal(-22d * Math.random() - 1d).setScale(CURRENCY.getDefaultFractionDigits(), RoundingMode.HALF_EVEN);
 	private final int TEST_POSITIVE_QUANTITY = (int) (12d * Math.random()) + 1;
 	private final int TEST_NEGATIVE_QUANTITY = (int) (-17d * Math.random()) - 1;
-	private final String TEST_SKU = UUID.randomUUID().toString();
+	private final Sku TEST_SKU = new Sku("ABC-09-XY-45027");
+	private final Sku TEST_ALT_SKU = new Sku("DEF-09-XY-45027");
 	private final LineItem INSTANCE = new LineItem(TEST_SKU, TEST_POSITIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
+	private final BigDecimal TEST_TOTAL_COST = TEST_POSTITIVE_AMOUNT.multiply(new BigDecimal(TEST_POSITIVE_QUANTITY));
 
 	/**
 	 * Test of getAmount method, of class LineItem.
 	 */
 	@Test
+	@SuppressWarnings("deprecation")
 	public void testGetAmount() {
-		assertThat("Wrong amount.", INSTANCE.getAmount(), closeTo(TEST_POSTITIVE_AMOUNT, 0.001));
+		assertThat("Wrong amount.", INSTANCE.getAmount(), closeTo(TEST_POSTITIVE_AMOUNT.doubleValue(), 0.001));
+	}
+
+	/**
+	 * Test of getAmount method, of class LineItem.
+	 */
+	@Test
+	public void testGetItemUnitPrice() {
+		assertThat("Wrong amount.", INSTANCE.getItemUnitPrice(), is(TEST_POSTITIVE_AMOUNT));
 	}
 
 	/**
@@ -42,32 +57,42 @@ public class LineItemTest {
 	 */
 	@Test
 	public void testGetSKU() {
-		assertThat("Wrong amount.", INSTANCE.getSKU(), is(TEST_SKU));
+		assertThat("Wrong amount.", INSTANCE.getSKU(), is(TEST_SKU.toString()));
 	}
 
-	@Test(expected = RuntimeException.class)
+	/**
+	 * Test of getItemSKU method, of class LineItem.
+	 */
+	@Test
+	public void testGetItemSKU() {
+		assertThat("Wrong amount.", INSTANCE.getItemSKU(), is(TEST_SKU));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testConstructorBadSku() {
+		newLineItem("bad SKU", 0, TEST_POSTITIVE_AMOUNT.doubleValue());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
 	public void testConstructorZeroQuantity() {
 		newLineItem(TEST_SKU, 0, TEST_POSTITIVE_AMOUNT);
 	}
 
-	@Test(expected = RuntimeException.class)
+	@Test
 	public void testConstructorNegativeQuantity() {
-		newLineItem(TEST_SKU, TEST_NEGATIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
+		final LineItem instance = new LineItem(TEST_SKU, TEST_NEGATIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
+		assertThat("Negative quanity for return.", instance.getItemQuantity(), is(TEST_NEGATIVE_QUANTITY));
 	}
 
 	@Test
 	public void testConstructorZeroAmount() {
-		final LineItem instance = new LineItem(TEST_SKU, TEST_POSITIVE_QUANTITY, 0);
-		assertThat("Amount should be zero (free).", instance.getAmount(), closeTo(0, 0.001));
+		final LineItem instance = new LineItem(TEST_SKU, TEST_POSITIVE_QUANTITY, BigDecimal.ZERO);
+		assertThat("Amount should be zero (free).", instance.getItemUnitPrice().toString(), is("0.00"));
 	}
 
-	// Not sure why this is supported makes no sense to me.
-	// Documented the behavior with this test.
-	// TODO: Check with product owner to see if the negative value for the amount should be supported.
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public void testConstructorNegativeAmount() {
-		final LineItem instance = new LineItem(TEST_SKU, TEST_POSITIVE_QUANTITY, TEST_NEGATIVE_AMOUNT);
-		assertThat("Amount should be negative.", instance.getAmount(), closeTo(TEST_NEGATIVE_AMOUNT, 0.001));
+		newLineItem(TEST_SKU, TEST_POSITIVE_QUANTITY, TEST_NEGATIVE_AMOUNT);
 	}
 
 	/**
@@ -101,7 +126,7 @@ public class LineItemTest {
 	 */
 	@Test
 	public void testEqualsFalseAmount() {
-		final LineItem instance = new LineItem(TEST_SKU, TEST_POSITIVE_QUANTITY, 0);
+		final LineItem instance = new LineItem(TEST_SKU, TEST_POSITIVE_QUANTITY, BigDecimal.ZERO);
 		assertNotEquals("The LineItems should not be equal.", INSTANCE, instance);
 	}
 
@@ -110,7 +135,7 @@ public class LineItemTest {
 	 */
 	@Test
 	public void testEqualsFalseSku() {
-		final LineItem instance = new LineItem("Other", TEST_POSITIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
+		final LineItem instance = new LineItem(TEST_ALT_SKU, TEST_POSITIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
 		assertNotEquals("The LineItems should not be equal.", INSTANCE, instance);
 	}
 
@@ -137,7 +162,7 @@ public class LineItemTest {
 	 */
 	@Test
 	public void testHashCodeNotEqualsAmount() {
-		final LineItem instance = new LineItem(TEST_SKU, TEST_POSITIVE_QUANTITY, 0);
+		final LineItem instance = new LineItem(TEST_SKU, TEST_POSITIVE_QUANTITY, BigDecimal.ZERO);
 		assertNotEquals("The hashcodes should not match.", INSTANCE.hashCode(), instance.hashCode());
 	}
 
@@ -146,14 +171,45 @@ public class LineItemTest {
 	 */
 	@Test
 	public void testHashCodeNotEqualsSku() {
-		final LineItem instance = new LineItem("Other", TEST_POSITIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
+		final LineItem instance = new LineItem(TEST_ALT_SKU, TEST_POSITIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
 		assertNotEquals("The hashcodes should not match.", INSTANCE.hashCode(), instance.hashCode());
 	}
 
 	// Keeps IDE or other quality checker from compaining about constructing a new
 	// object without capturing its referece.
-	private LineItem newLineItem(String SKU, int quantity, double unitPrice) {
+	private LineItem newLineItem(final Sku SKU, final int quantity, final BigDecimal unitPrice) {
 		return new LineItem(SKU, quantity, unitPrice);
 	}
 
+	// Keeps IDE or other quality checker from compaining about constructing a new
+	// object without capturing its referece.
+	@SuppressWarnings("deprecation")
+	private LineItem newLineItem(final String SKU, final int quantity, final double unitPrice) {
+		return new LineItem(SKU, quantity, unitPrice);
+	}
+
+	/**
+	 * Test of getCost method, of class LineItem.
+	 */
+	@Test
+	public void testGetCost() {
+		assertThat("Cost not calculated correctly.", INSTANCE.getCost(), is(TEST_TOTAL_COST));
+	}
+
+	/**
+	 * Test of isReturn method, of class LineItem.
+	 */
+	@Test
+	public void testIsReturn() {
+		final LineItem instance = new LineItem(TEST_SKU, TEST_NEGATIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
+		assertThat("Should be return.", instance.isReturn(), is(true));
+	}
+
+	/**
+	 * Test of isReturn method, of class LineItem.
+	 */
+	@Test
+	public void testIsReturnFalse() {
+		assertThat("Should be return.", INSTANCE.isReturn(), is(false));
+	}
 }

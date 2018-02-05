@@ -14,6 +14,7 @@ public class InvoiceTest {
 	private final BigDecimal TEST_UNIT_PRICE_1 = new BigDecimal(15).setScale(CURRENCY.getDefaultFractionDigits());
 	private final BigDecimal TEST_UNIT_PRICE_2 = new BigDecimal(14).setScale(CURRENCY.getDefaultFractionDigits());
 	private final BigDecimal TEST_EXPECTED_TOTAL = new BigDecimal(57).setScale(CURRENCY.getDefaultFractionDigits());
+	private final BigDecimal TEST_EXPECTED_TOTAL_WITH_RETURNS = new BigDecimal(-27).setScale(CURRENCY.getDefaultFractionDigits());
 
 	private Invoice invoice;
 
@@ -46,7 +47,6 @@ public class InvoiceTest {
 	}
 
 	@Test
-	@SuppressWarnings("deprecation")
 	public void testAddTwoItemsInvoiceTotal() {
 		invoice.add(new LineItem(TEST_SKU, 1, TEST_UNIT_PRICE_1));
 		invoice.add(new LineItem(TEST_SKU, 3, TEST_UNIT_PRICE_2));
@@ -71,5 +71,12 @@ public class InvoiceTest {
 	@Test(expected = NullPointerException.class)
 	public void testAddNull() {
 		invoice.add(null);
+	}
+
+	@Test
+	public void testTotalWithReturns() {
+		invoice.add(new LineItem(TEST_SKU, 1, TEST_UNIT_PRICE_1));
+		invoice.add(new LineItem(TEST_SKU, -3, TEST_UNIT_PRICE_2));
+		assertEquals("Unexpected total value.", TEST_EXPECTED_TOTAL_WITH_RETURNS, invoice.getInvoiceTotal());
 	}
 }

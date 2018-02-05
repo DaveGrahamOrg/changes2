@@ -46,7 +46,7 @@ public class LineItem {
 	public LineItem(final Sku sku, final int quantity, final BigDecimal unitPrice) {
 		Preconditions.checkNotNull(sku, "sku == null");
 		Preconditions.checkNotNull(unitPrice, "unitPrice == null");
-		Preconditions.checkArgument(quantity > 0, "Quantity must be greater than zero.");
+		Preconditions.checkArgument(quantity != 0, "Quantity cannot be zero.");
 		Preconditions.checkArgument(unitPrice.compareTo(BigDecimal.ZERO) >= 0, "unitPrice < 0");
 		this.sku = sku;
 		this.itemQuantity = quantity;
@@ -153,5 +153,15 @@ public class LineItem {
 	 */
 	public BigDecimal getCost() {
 		return getItemUnitPrice().multiply(new BigDecimal(getItemQuantity()));
+	}
+
+	/**
+	 * Determine if the {@code LineItem} represents a return of items.
+	 *
+	 * @return true if the {@code LineItem} represents a return of items
+	 * @since 1.1
+	 */
+	public boolean isReturn() {
+		return itemQuantity < 0;
 	}
 }

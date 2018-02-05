@@ -78,9 +78,10 @@ public class LineItemTest {
 		newLineItem(TEST_SKU, 0, TEST_POSTITIVE_AMOUNT);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testConstructorNegativeQuantity() {
-		newLineItem(TEST_SKU, TEST_NEGATIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
+		final LineItem instance = new LineItem(TEST_SKU, TEST_NEGATIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
+		assertThat("Negative quanity for return.", instance.getItemQuantity(), is(TEST_NEGATIVE_QUANTITY));
 	}
 
 	@Test
@@ -192,7 +193,23 @@ public class LineItemTest {
 	 */
 	@Test
 	public void testGetCost() {
-		assertThat("Cost not calcualted correctly.", INSTANCE.getCost(), is(TEST_TOTAL_COST));
+		assertThat("Cost not calculated correctly.", INSTANCE.getCost(), is(TEST_TOTAL_COST));
 	}
 
+	/**
+	 * Test of isReturn method, of class LineItem.
+	 */
+	@Test
+	public void testIsReturn() {
+		final LineItem instance = new LineItem(TEST_SKU, TEST_NEGATIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
+		assertThat("Should be return.", instance.isReturn(), is(true));
+	}
+
+	/**
+	 * Test of isReturn method, of class LineItem.
+	 */
+	@Test
+	public void testIsReturnFalse() {
+		assertThat("Should be return.", INSTANCE.isReturn(), is(false));
+	}
 }

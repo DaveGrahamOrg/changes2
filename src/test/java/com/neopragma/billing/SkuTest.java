@@ -314,18 +314,26 @@ public class SkuTest {
 		newSku(TEST_PART_1, TEST_PART_2_INT, TEST_PART_3, -28354);
 	}
 
+	// Keeps IDE or other quality checker from compaining about constructing a new
+	// object without capturing its referece.
 	private Sku newSku(final String... parts) {
 		return new Sku(parts);
 	}
 
+	// Keeps IDE or other quality checker from compaining about constructing a new
+	// object without capturing its referece.
 	private Sku newSku(final Collection<String> parts) {
 		return new Sku(parts);
 	}
 
+	// Keeps IDE or other quality checker from compaining about constructing a new
+	// object without capturing its referece.
 	private Sku newSku(final String value) {
 		return new Sku(value);
 	}
 
+	// Keeps IDE or other quality checker from compaining about constructing a new
+	// object without capturing its referece.
 	private Sku newSku(final String part1, final int part2, final String part3, final int part4) {
 		return new Sku(part1, part2, part3, part4);
 	}

@@ -10,20 +10,35 @@ import com.google.common.base.Preconditions;
  */
 public class LineItem {
 
-	private final String sku;
+	private final Sku sku;
 	private final int itemQuantity;
 	private final double unitPrice;
 
 	/**
 	 * Construct a new instance of {@code LineItem}.
 	 *
-	 * @param sku the SKU number for the item
+	 * @param sku the SKU code for the item
+	 * @param quantity the number of items (must be positive)
+	 * @param unitPrice the unit price for each item
+	 * @throws NullPointerException if {@code sku} is {@code null}
+	 * @throws IllegalArgumentException if (@code quantity} &lt; 1
+	 * @deprecated as of 1.1 use {@link LineItem#LineItem(com.neopragma.billing.Sku, int, double) )
+	 */
+	@Deprecated
+	public LineItem(final String sku, final int quantity, final double unitPrice) {
+		this(new Sku(sku), quantity, unitPrice);
+	}
+
+	/**
+	 * Construct a new instance of {@code LineItem}.
+	 *
+	 * @param sku the SKU code for the item
 	 * @param quantity the number of items (must be positive)
 	 * @param unitPrice the unit price for each item
 	 * @throws NullPointerException if {@code sku} is {@code null}
 	 * @throws IllegalArgumentException if (@code quantity} &lt; 1
 	 */
-	public LineItem(final String sku, final int quantity, final double unitPrice) {
+	public LineItem(final Sku sku, final int quantity, final double unitPrice) {
 		Preconditions.checkNotNull(sku, "sku == null");
 		Preconditions.checkArgument(quantity > 0, "Quantity must be greater than zero.");
 		this.sku = sku;
@@ -62,11 +77,20 @@ public class LineItem {
 	}
 
 	/**
-	 * Get the product SKU identity.
+	 * Get the product SKU code as a string.
 	 *
-	 * @return the product SKU identity
+	 * @return the product SKU code as a string
 	 */
 	public String getSKU() {
+		return sku.toString();
+	}
+
+	/**
+	 * Get the product SKU code.
+	 *
+	 * @return the product SKU code
+	 */
+	public Sku getItemSKU() {
 		return sku;
 	}
 
@@ -103,10 +127,10 @@ public class LineItem {
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(getClass())
-			.add("SKU", sku)
-			.add("itemQuantity", itemQuantity)
-			.add("unitPrice", unitPrice)
-			.toString();
+				.add("SKU", sku)
+				.add("itemQuantity", itemQuantity)
+				.add("unitPrice", unitPrice)
+				.toString();
 	}
 
 	/**

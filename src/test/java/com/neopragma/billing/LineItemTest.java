@@ -1,6 +1,5 @@
 package com.neopragma.billing;
 
-import java.util.UUID;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertEquals;
@@ -17,7 +16,8 @@ public class LineItemTest {
 	private final double TEST_NEGATIVE_AMOUNT = -22d * Math.random() - 1d;
 	private final int TEST_POSITIVE_QUANTITY = (int) (12d * Math.random()) + 1;
 	private final int TEST_NEGATIVE_QUANTITY = (int) (-17d * Math.random()) - 1;
-	private final String TEST_SKU = UUID.randomUUID().toString();
+	private final Sku TEST_SKU = new Sku("ABC-09-XY-45027");
+	private final Sku TEST_ALT_SKU = new Sku("DEF-09-XY-45027");
 	private final LineItem INSTANCE = new LineItem(TEST_SKU, TEST_POSITIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
 	private final double TEST_TOTAL_COST = TEST_POSTITIVE_AMOUNT * TEST_POSITIVE_QUANTITY;
 
@@ -43,15 +43,28 @@ public class LineItemTest {
 	 */
 	@Test
 	public void testGetSKU() {
-		assertThat("Wrong amount.", INSTANCE.getSKU(), is(TEST_SKU));
+		assertThat("Wrong amount.", INSTANCE.getSKU(), is(TEST_SKU.toString()));
 	}
 
-	@Test(expected = RuntimeException.class)
+	/**
+	 * Test of getItemSKU method, of class LineItem.
+	 */
+	@Test
+	public void testGetItemSKU() {
+		assertThat("Wrong amount.", INSTANCE.getItemSKU(), is(TEST_SKU));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testConstructorBadSku() {
+		newLineItem("bad SKU", 0, TEST_POSTITIVE_AMOUNT);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
 	public void testConstructorZeroQuantity() {
 		newLineItem(TEST_SKU, 0, TEST_POSTITIVE_AMOUNT);
 	}
 
-	@Test(expected = RuntimeException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testConstructorNegativeQuantity() {
 		newLineItem(TEST_SKU, TEST_NEGATIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
 	}
@@ -111,7 +124,7 @@ public class LineItemTest {
 	 */
 	@Test
 	public void testEqualsFalseSku() {
-		final LineItem instance = new LineItem("Other", TEST_POSITIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
+		final LineItem instance = new LineItem(TEST_ALT_SKU, TEST_POSITIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
 		assertNotEquals("The LineItems should not be equal.", INSTANCE, instance);
 	}
 
@@ -147,16 +160,22 @@ public class LineItemTest {
 	 */
 	@Test
 	public void testHashCodeNotEqualsSku() {
-		final LineItem instance = new LineItem("Other", TEST_POSITIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
+		final LineItem instance = new LineItem(TEST_ALT_SKU, TEST_POSITIVE_QUANTITY, TEST_POSTITIVE_AMOUNT);
 		assertNotEquals("The hashcodes should not match.", INSTANCE.hashCode(), instance.hashCode());
 	}
 
 	// Keeps IDE or other quality checker from compaining about constructing a new
 	// object without capturing its referece.
-	private LineItem newLineItem(String SKU, int quantity, double unitPrice) {
+	private LineItem newLineItem(Sku SKU, int quantity, double unitPrice) {
 		return new LineItem(SKU, quantity, unitPrice);
 	}
 
+	// Keeps IDE or other quality checker from compaining about constructing a new
+	// object without capturing its referece.
+	@SuppressWarnings("deprecation")
+	private LineItem newLineItem(String SKU, int quantity, double unitPrice) {
+		return new LineItem(SKU, quantity, unitPrice);
+	}
 
 	/**
 	 * Test of getCost method, of class LineItem.

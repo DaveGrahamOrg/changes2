@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Immutable Stock Keeping Unit identification modeled as list of four string
+ * Immutable Stock Keeping Unit code modeled as list of four string
  * elements in order.
  *
  * Stock Keeping Unit (SKU) is a business domain concept. SKUs for our business

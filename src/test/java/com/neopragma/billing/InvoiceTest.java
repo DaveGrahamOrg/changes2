@@ -1,13 +1,12 @@
 package com.neopragma.billing;
 
-import java.util.UUID;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
 public class InvoiceTest {
 
-	private final String TEST_SKU = UUID.randomUUID().toString();
+	private final Sku TEST_SKU = new Sku("ABC-09-XY-45027");
 
 	private Invoice invoice;
 
